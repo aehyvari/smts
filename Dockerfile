@@ -29,20 +29,19 @@ ENV FLAGS -Wall
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt install -y apt-utils make cmake \
      build-essential libgmp-dev libedit-dev libsqlite3-dev bison flex libubsan0 \
-     zlib1g-dev libopenmpi-dev git python3
+     zlib1g-dev libopenmpi-dev git sudo python3-mpi4py python3
 RUN cd home; git clone https://github.com/MasoudAsadzade/SMTS.git
 RUN sh home/SMTS/ci/run_travis_opensmtCommands.sh
 
 RUN sh home/SMTS/ci/run_travis_smtsCommands.sh
 CMD [ "python3", "home/SMTS/server/smts.py","-o4","-l"]
 
-FROM smts_base AS smts_liaison
-RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt install -y awscli python3 mpi
-COPY --from=builder /home/SMTS /home/SMTS
-ADD make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
-RUN chmod 755 supervised-scripts/make_combined_hostfile.py
-ADD mpi-run.sh supervised-scripts/mpi-run.sh
-USER smts
-CMD ["/usr/sbin/sshd", "-D", "-f", "/home/smts/.ssh/sshd_config"]
-CMD supervised-scripts/mpi-run.sh
+RUN  sudo -s
+#ADD . mpi4py
+RUN  echo 'btl_base_warn_component_unused = 0' > /etc/openmpi/openmpi-mca-params.conf
+RUN  exit
+#RUN  cd mpi4py
+
+#RUN cat mpi4py/host_list
+CMD [ "mpirun", "--allow-run-as-root","-n","3","python3","home/SMTS/server/smts.py -c home/SMTS/server/my_config.py -o4 -l"]
+#CMD [ "mpirun", "--allow-run-as-root","-n","3","--hostfile","mpi4py/host_list","python3","mpi4py/mpi4.py"]
