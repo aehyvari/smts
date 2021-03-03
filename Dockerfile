@@ -43,8 +43,8 @@ RUN  echo 'btl_base_warn_component_unused = 0' > /etc/openmpi/openmpi-mca-params
 #RUN  cd SMTS
 
 #RUN cat SMTS/host_list
-CMD [ "python3", "home/SMTS/server/smts.py","-l"]
-RUN sleep 0.1;
 CMD [ "mpirun", "--allow-run-as-root","-n","1","/home/SMTS/build/solver_opensmt","-s172.18.0.2:3000"]
+RUN sleep 0.5;
+CMD [ "python3", "home/SMTS/server/smts.py","-l"]
 #CMD [ "python3", "home/SMTS/server/smts.py","-l"]
 #CMD [ "mpirun", "--allow-run-as-root","-n","3","--hostfile","home/SMTS/server/host_list","python3","home/SMTS/server/home/SMTS/server/.py"]
