@@ -39,10 +39,12 @@ RUN sh home/SMTS/ci/run_travis_smtsCommands.sh
 RUN  sudo -s
 #ADD . mpi4py
 RUN  echo 'btl_base_warn_component_unused = 0' > /etc/openmpi/openmpi-mca-params.conf
-RUN  exit
+#RUN  exit
 #RUN  cd SMTS
 
 #RUN cat SMTS/host_list
-#CMD [ "mpirun", "--allow-run-as-root","-n","1","/home/SMTS/build/solver_opensmt","-s172.18.0.2:3000"]
 CMD [ "python3", "home/SMTS/server/smts.py","-l"]
+RUN sleep 600;
+CMD [ "mpirun", "--allow-run-as-root","-n","1","/home/SMTS/build/solver_opensmt","-s172.18.0.2:3000"]
+#CMD [ "python3", "home/SMTS/server/smts.py","-l"]
 #CMD [ "mpirun", "--allow-run-as-root","-n","3","--hostfile","home/SMTS/server/host_list","python3","home/SMTS/server/home/SMTS/server/.py"]
