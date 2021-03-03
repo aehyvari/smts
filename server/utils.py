@@ -85,11 +85,16 @@ def run_lemma_server(lemma_server, database, send_again):
 
 def run_solvers(*solvers):
     ps = []
+    ip = '127.0.0.1'
+    try:
+        ip = socket.gethostbyname(socket.gethostname())
+    except:
+        pass
     for path, n in solvers:
         if n:
             for _ in range(n):
                 try:
-                    ps.append(subprocess.Popen([path, '-s127.0.0.1:' + str(config.port)],
+                    ps.append(subprocess.Popen([path, '-s'+ip+':' + str(config.port)],
                                                stdout=subprocess.DEVNULL,
                                                stderr=subprocess.DEVNULL))
                 except BaseException as ex:

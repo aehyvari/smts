@@ -34,14 +34,14 @@ RUN cd home; git clone https://github.com/MasoudAsadzade/SMTS.git
 RUN sh home/SMTS/ci/run_travis_opensmtCommands.sh
 
 RUN sh home/SMTS/ci/run_travis_smtsCommands.sh
-CMD [ "python3", "home/SMTS/server/smts.py","-o4","-l"]
+CMD [ "python3", "home/SMTS/server/smts.py","-c","home/SMTS/server/my_config.py","-o4","-l"]
 
 RUN  sudo -s
 #ADD . mpi4py
 RUN  echo 'btl_base_warn_component_unused = 0' > /etc/openmpi/openmpi-mca-params.conf
 RUN  exit
-#RUN  cd mpi4py
+#RUN  cd SMTS
 
-#RUN cat mpi4py/host_list
-#CMD [ "mpirun", "--allow-run-as-root","-n","1","python3","home/SMTS/server/smts.py"]
-#CMD [ "mpirun", "--allow-run-as-root","-n","3","--hostfile","mpi4py/host_list","python3","mpi4py/mpi4.py"]
+#RUN cat SMTS/host_list
+#CMD [ "mpirun", "--allow-run-as-root","-n","1","python3","home/SMTS/server/home/SMTS/server/.py"]
+#CMD [ "mpirun", "--allow-run-as-root","-n","3","--hostfile","home/SMTS/server/host_list","python3","home/SMTS/server/home/SMTS/server/.py"]
