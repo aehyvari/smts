@@ -43,6 +43,6 @@ RUN  exit
 #RUN  cd SMTS
 
 #RUN cat SMTS/host_list
-CMD [ "mpirun", "--allow-run-as-root","-n","1","/home/SMTS/build/solver_opensmt","-s172.18.0.2:3000"]
+#CMD [ "mpirun", "--allow-run-as-root","-n","1","/home/SMTS/build/solver_opensmt","-s172.18.0.2:3000"]
 CMD [ "python3", "home/SMTS/server/smts.py","-l"]
 #CMD [ "mpirun", "--allow-run-as-root","-n","3","--hostfile","home/SMTS/server/host_list","python3","home/SMTS/server/home/SMTS/server/.py"]
