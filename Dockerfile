@@ -43,5 +43,5 @@ RUN  exit
 #RUN  cd mpi4py
 
 #RUN cat mpi4py/host_list
-CMD [ "mpirun", "--allow-run-as-root","-n","3","python3","home/SMTS/server/smts.py -c home/SMTS/server/my_config.py -o4 -l"]
+CMD [ "mpirun", "--allow-run-as-root","-n","3","python3","home/SMTS/server/smts.py"]
 #CMD [ "mpirun", "--allow-run-as-root","-n","3","--hostfile","mpi4py/host_list","python3","mpi4py/mpi4.py"]
