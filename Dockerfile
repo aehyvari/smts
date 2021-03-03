@@ -34,7 +34,7 @@ RUN cd home; git clone https://github.com/MasoudAsadzade/SMTS.git
 RUN sh home/SMTS/ci/run_travis_opensmtCommands.sh
 EXPOSE 9898
 RUN sh home/SMTS/ci/run_travis_smtsCommands.sh
-CMD [ "python3", "home/SMTS/server/smts.py","-l"]
+RUN [ "python3", "home/SMTS/server/smts.py","-l"]
 #CMD [ "python3", "home/SMTS/server/smts.py","-c","home/SMTS/server/my_config.py","-o4","-l"]
 RUN  sudo -s
 #ADD . mpi4py
