@@ -22,7 +22,7 @@ EXPOSE 22
 ################
 FROM ubuntu:18.04 AS builder
 ENV CMAKE_BUILD_TYPE Release
-ENV INSTALL ./opensmt
+ENV INSTALL SMTS/opensmt
 ENV USE_READLINE OFF
 ENV FLAGS -Wall
 RUN apt-get update \
