@@ -31,7 +31,7 @@ RUN apt-get update \
      zlib1g-dev libopenmpi-dev git sudo python3-mpi4py python3
 RUN git clone https://github.com/MasoudAsadzade/SMTS.git
 RUN cd SMTS && sh ./ci/run_travis_opensmtCommands.sh
-RUN sh ./ci/run_travis_smtsCommands.sh
+RUN cd ../.. && sh ./ci/run_travis_smtsCommands.sh
 
 #CMD [ "python3", "home/SMTS/server/smts.py","-c","home/SMTS/server/my_config.py","-o4","-l"]
 #RUN  sudo -s
@@ -43,7 +43,7 @@ RUN sh ./ci/run_travis_smtsCommands.sh
 #RUN cat SMTS/host_list
 #CMD [ "mpirun", "--allow-run-as-root","-n","1","/home/SMTS/build/solver_opensmt","-s172.18.0.2:3000"]
 #RUN sleep 0.5;
-CMD [ "python3", "./server/smts.py","-o4","-l"]
+CMD [ "python3", "SMTS/server/smts.py","-o4","-l"]
 #CMD [ "python3", "home/SMTS/server/smts.py","-l"]
 #CMD [ "mpirun", "--allow-run-as-root","-n","3","--hostfile","home/SMTS/server/host_list","python3","home/SMTS/server/home/SMTS/server/.py"]
 
