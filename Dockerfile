@@ -57,5 +57,5 @@ ADD mpi-run.sh supervised-scripts/mpi-run.sh
 USER smts
 CMD ["/usr/sbin/sshd", "-D", "-f", "/SMTS/.ssh/sshd_config"]
 #CMD sh supervised-scripts/mpi-run.sh
-WORKDIR /SMTS/
-CMD [ "python3", "./server/smts.py","-o4","-l"]
+#WORKDIR /SMTS/
+CMD [ "python3", "SMTS/server/smts.py","-o4","-l"]
