@@ -49,7 +49,7 @@ RUN cd SMTS && sh ./ci/run_travis_smtsCommands.sh
 FROM smts_base AS smts_liaison
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt install -y awscli python3 mpi
-COPY --from=builder /SMTS .
+COPY --from=builder /SMTS /SMTS
 #COPY --from=builder /SMTS /SMTS
 ADD make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
 RUN chmod 755 supervised-scripts/make_combined_hostfile.py
@@ -58,4 +58,4 @@ USER smts
 CMD ["/usr/sbin/sshd", "-D", "-f", "/SMTS/.ssh/sshd_config"]
 #CMD sh supervised-scripts/mpi-run.sh
 #WORKDIR /SMTS/
-CMD [ "python3", "SMTS/server/smts.py","-o4","-l"]
+CMD [ "python3", "SMTS/SMTS/server/smts.py","-o4","-l"]
