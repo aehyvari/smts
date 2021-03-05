@@ -12,7 +12,7 @@ RUN apt-get update \
         && cp /etc/ssh/sshd_config ~/.ssh/sshd_config \
         && sed -i "s/UsePrivilegeSeparation yes/UsePrivilegeSeparation no/g" ~/.ssh/sshd_config \
         && printf "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config'
-WORKDIR /SMTS/
+#WORKDIR /SMTS/
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 
