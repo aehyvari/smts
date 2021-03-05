@@ -56,8 +56,7 @@ RUN chmod 755 supervised-scripts/make_combined_hostfile.py
 ADD mpi-run.sh supervised-scripts/mpi-run.sh
 USER smts
 #CMD ["/usr/sbin/sshd", "-D", "-f", ".ssh/sshd_config"]
-ADD mpi-run.sh supervised-scripts/mpi-run.sh
 #CMD sh supervised-scripts/mpi-run.sh
 #WORKDIR /SMTS/
-RUN sleep 9000000
+#RUN sleep 9000000
 CMD [ "python3", "SMTS/server/smts.py","-o4","-l"]
