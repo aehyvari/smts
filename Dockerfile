@@ -33,19 +33,6 @@ RUN git clone https://github.com/MasoudAsadzade/SMTS.git
 RUN cd SMTS && sh ./ci/run_travis_opensmtCommands.sh
 RUN cd SMTS && sh ./ci/run_travis_smtsCommands.sh
 
-#CMD [ "python3", "home/SMTS/server/smts.py","-c","home/SMTS/server/my_config.py","-o4","-l"]
-#RUN  sudo -s
-#ADD . mpi4py
-#RUN  echo 'btl_base_warn_component_unused = 0' > /etc/openmpi/openmpi-mca-params.conf
-#RUN  exit
-#RUN  cd SMTS
-
-#RUN cat SMTS/host_list
-#CMD [ "mpirun", "--allow-run-as-root","-n","1","/home/SMTS/build/solver_opensmt","-s172.18.0.2:3000"]
-#RUN sleep 0.5;
-
-#CMD [ "python3", "home/SMTS/server/smts.py","-l"]
-#CMD [ "mpirun", "--allow-run-as-root","-n","3","--hostfile","home/SMTS/server/host_list","python3","home/SMTS/server/home/SMTS/server/.py"]
 FROM smts_base AS smts_liaison
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt install -y awscli python3 mpi python python-pip
@@ -57,8 +44,8 @@ ADD make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
 RUN chmod 755 supervised-scripts/make_combined_hostfile.py
 ADD mpi-run.sh supervised-scripts/mpi-run.sh
 USER smts
-#CMD ["/usr/sbin/sshd", "-D", "-f", ".ssh/sshd_config"]
+CMD ["/usr/sbin/sshd", "-D", "-f", ".ssh/sshd_config"]
 #CMD sh supervised-scripts/mpi-run.sh
 #WORKDIR /SMTS/
-#RUN sleep 9000000
-CMD [ "python3", "SMTS/server/smts.py","-o4","-l"]
+RUN sleep 9000000
+#CMD [ "python3", "SMTS/server/smts.py","-o4","-l"]
