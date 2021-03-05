@@ -50,7 +50,7 @@ FROM smts_base AS smts_liaison
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt install -y awscli python3 mpi python python-pip
 COPY --from=builder SMTS/ /SMTS
-COPY --from=builder /SMTS/version.sh /SMTS/version.sh
+
 
 #COPY --from=builder /SMTS /SMTS
 ADD make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
