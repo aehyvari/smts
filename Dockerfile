@@ -48,7 +48,7 @@ RUN cd SMTS && sh ./ci/run_travis_smtsCommands.sh
 #CMD [ "mpirun", "--allow-run-as-root","-n","3","--hostfile","home/SMTS/server/host_list","python3","home/SMTS/server/home/SMTS/server/.py"]
 FROM smts_base AS smts_liaison
 RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt install -y awscli python3 mpi
+    && DEBIAN_FRONTEND=noninteractive apt install -y awscli python3 mpi python python-pip
 COPY --from=builder SMTS/ /SMTS
 COPY --from=builder /SMTS/version.sh /SMTS/version.sh
 
