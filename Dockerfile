@@ -12,7 +12,7 @@ RUN apt-get update \
         && cp /etc/ssh/sshd_config ~/.ssh/sshd_config \
         && sed -i "s/UsePrivilegeSeparation yes/UsePrivilegeSeparation no/g" ~/.ssh/sshd_config \
         && printf "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config'
-WORKDIR /home/smts/
+WORKDIR /SMTS/
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 
@@ -28,7 +28,7 @@ ENV FLAGS -Wall
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt install -y apt-utils make cmake \
      build-essential libgmp-dev libedit-dev libsqlite3-dev bison flex libubsan0 \
-     zlib1g-dev libopenmpi-dev git sudo python3-mpi4py python3
+     zlib1g-dev libopenmpi-dev git
 RUN git clone https://github.com/MasoudAsadzade/SMTS.git
 RUN cd SMTS && sh ./ci/run_travis_opensmtCommands.sh
 RUN cd SMTS && sh ./ci/run_travis_smtsCommands.sh
@@ -43,7 +43,17 @@ RUN cd SMTS && sh ./ci/run_travis_smtsCommands.sh
 #RUN cat SMTS/host_list
 #CMD [ "mpirun", "--allow-run-as-root","-n","1","/home/SMTS/build/solver_opensmt","-s172.18.0.2:3000"]
 #RUN sleep 0.5;
-CMD [ "python3", "SMTS/server/smts.py","-o4","-l"]
+
 #CMD [ "python3", "home/SMTS/server/smts.py","-l"]
 #CMD [ "mpirun", "--allow-run-as-root","-n","3","--hostfile","home/SMTS/server/host_list","python3","home/SMTS/server/home/SMTS/server/.py"]
-
+FROM smts_base AS smts_liaison
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt install -y awscli python3 mpi
+COPY --from=builder /SMTS /SMTS
+ADD make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
+RUN chmod 755 supervised-scripts/make_combined_hostfile.py
+ADD mpi-run.sh supervised-scripts/mpi-run.sh
+USER smts
+CMD ["/usr/sbin/sshd", "-D", "-f", "/home/smts/.ssh/sshd_config"]
+#CMD sh supervised-scripts/mpi-run.sh
+CMD [ "python3", "./server/smts.py","-o4","-l"]
