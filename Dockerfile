@@ -1,4 +1,4 @@
-FROM ubuntu:20.04.2.0 AS smts_base
+FROM ubuntu:20.04 AS smts_base
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt install -y openssh-server iproute2 openmpi-bin openmpi-common iputils-ping \
     && mkdir /var/run/sshd \
@@ -20,7 +20,7 @@ RUN echo "export VISIBLE=now" >> /etc/profile
 #CMD ["/usr/sbin/sshd", "-D", "-f", "/home/smts/.ssh/sshd_config"]
 EXPOSE 22
 ################
-FROM ubuntu:20.04.2.0 AS builder
+FROM ubuntu:20.04 AS builder
 ENV CMAKE_BUILD_TYPE Release
 ENV INSTALL SMTS/opensmt
 ENV USE_READLINE OFF
