@@ -54,8 +54,8 @@ COPY --from=builder SMTS/ /SMTS
 
 #COPY --from=builder /SMTS /SMTS
 ADD make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
-RUN python make_combined_hostfile.py
-ADD mpi-run.sh SMTS/supervised-scripts/mpi-run.sh
+RUN python SMTS/make_combined_hostfile.py
+ADD mpi-run.sh supervised-scripts/mpi-run.sh
 USER smts
 #CMD ["/usr/sbin/sshd", "-D", "-f", ".ssh/sshd_config"]
 #CMD sh supervised-scripts/mpi-run.sh
