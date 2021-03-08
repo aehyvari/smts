@@ -5,6 +5,6 @@ git clone https://github.com/usi-verification-and-security/opensmt.git --branch 
 cd opensmt
 mkdir build 
 cd build
-cmake ..
+cmake -DCMAKE_INSTALL_PREFIX=${INSTALL} ..
 make -j4
 make install
