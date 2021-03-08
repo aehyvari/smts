@@ -12,7 +12,7 @@ RUN apt-get update \
         && cp /etc/ssh/sshd_config ~/.ssh/sshd_config \
         && sed -i "s/UsePrivilegeSeparation yes/UsePrivilegeSeparation no/g" ~/.ssh/sshd_config \
         && printf "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config'
-WORKDIR /home/smts/
+WORKDIR /home/
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 
@@ -30,10 +30,10 @@ RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt install -y apt-utils make cmake \
      build-essential libgmp-dev libedit-dev libsqlite3-dev bison flex libubsan0 \
      zlib1g-dev libopenmpi-dev git python3 awscli mpi
-RUN cd home; git clone https://github.com/MasoudAsadzade/SMTS.git
-RUN sh home/SMTS/ci/run_travis_opensmtCommands.sh
+RUN  git clone https://github.com/MasoudAsadzade/SMTS.git
+RUN sh SMTS/ci/run_travis_opensmtCommands.sh
 
-RUN sh home/SMTS/ci/run_travis_smtsCommands.sh
+RUN sh SMTS/ci/run_travis_smtsCommands.sh
 
 ADD make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
 RUN chmod 755 supervised-scripts/make_combined_hostfile.py
