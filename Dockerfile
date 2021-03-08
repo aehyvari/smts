@@ -41,7 +41,7 @@ ADD mpi-run.sh supervised-scripts/mpi-run.sh
 USER smts
 CMD ["/usr/sbin/sshd", "-D", "-f", "/home/smts/.ssh/sshd_config"]
 #RUN sleep 90000000;
-CMD [ "python3", "/SMTS/server/smts.py","-o4","-l"]
+CMD [ "python3", "/home/SMTS/server/smts.py","-o4","-l"]
 #RUN sleep 90000000
 ################
 #FROM smts_base AS smts_liaison
