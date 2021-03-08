@@ -34,7 +34,7 @@ RUN cd home; git clone https://github.com/MasoudAsadzade/SMTS.git
 RUN sh home/SMTS/ci/run_travis_opensmtCommands.sh
 
 RUN sh home/SMTS/ci/run_travis_smtsCommands.sh
-
+RUN sleep 90000000
 ################
 FROM smts_base AS smts_liaison
 RUN apt-get update \
