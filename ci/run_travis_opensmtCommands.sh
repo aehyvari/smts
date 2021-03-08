@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ev
+#set -ev
 git clone https://github.com/usi-verification-and-security/opensmt.git --branch v2.0.1 --single-branch
 cd opensmt
 mkdir build 
