@@ -21,6 +21,7 @@ RUN echo "export VISIBLE=now" >> /etc/profile
 EXPOSE 22
 ################
 FROM ubuntu:20.04 AS builder
+WORKDIR /home/smts
 ENV CMAKE_BUILD_TYPE Release
 ENV INSTALL SMTS/opensmt
 ENV USE_READLINE OFF
@@ -44,3 +45,21 @@ CMD ["python3", "SMTS/server/smts.py","-l","-o4"]
 #CMD [ "mpirun", "--allow-run-as-root","-n","1","/home/SMTS/build/solver_opensmt","-s172.18.0.2:3000"]
 #RUN sleep 0.5;
 
+#CMD [ "python3", "home/SMTS/server/smts.py","-l"]
+#CMD [ "mpirun", "--allow-run-as-root","-n","3","--hostfile","home/SMTS/server/host_list","python3","home/SMTS/server/home/SMTS/server/.py"]
+FROM smts_base AS smts_liaison
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt install -y awscli python3 mpi python python-pip
+COPY --from=builder SMTS/ /SMTS
+
+
+#COPY --from=builder /SMTS /SMTS
+ADD make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
+RUN chmod 755 supervised-scripts/make_combined_hostfile.py
+ADD mpi-run.sh supervised-scripts/mpi-run.sh
+USER smts
+CMD ["/usr/sbin/sshd", "-D", "-f", ".ssh/sshd_config"]
+#CMD sh supervised-scripts/mpi-run.sh
+#WORKDIR /SMTS/
+#RUN sleep 9000000
+CMD [ "python3", "SMTS/server/smts.py","-l","-o4"]
