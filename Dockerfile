@@ -1,4 +1,4 @@
-FROM ubuntu:18.04 AS smts_base
+FROM ubuntu:20.04 AS smts_base
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt install -y openssh-server iproute2 openmpi-bin openmpi-common iputils-ping \
     && mkdir /var/run/sshd \
@@ -20,7 +20,7 @@ RUN echo "export VISIBLE=now" >> /etc/profile
 #CMD ["/usr/sbin/sshd", "-D", "-f", "/home/smts/.ssh/sshd_config"]
 EXPOSE 22
 ################
-FROM ubuntu:18.04 AS builder
+FROM smts_base AS builder
 ENV CMAKE_BUILD_TYPE Release
 ENV INSTALL /home/opensmt
 ENV EXTERNALREPODIR opensmt
@@ -29,17 +29,12 @@ ENV FLAGS -Wall
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt install -y apt-utils make cmake \
      build-essential libgmp-dev libedit-dev libsqlite3-dev bison flex libubsan0 \
-     zlib1g-dev libopenmpi-dev git python3
+     zlib1g-dev libopenmpi-dev git python3 awscli mpi
 RUN cd home; git clone https://github.com/MasoudAsadzade/SMTS.git
 RUN sh home/SMTS/ci/run_travis_opensmtCommands.sh
 
 RUN sh home/SMTS/ci/run_travis_smtsCommands.sh
-#RUN sleep 90000000
-################
-FROM smts_base AS smts_liaison
-RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt install -y awscli python3 mpi
-COPY --from=builder /home /home
+
 ADD make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
 RUN chmod 755 supervised-scripts/make_combined_hostfile.py
 ADD mpi-run.sh supervised-scripts/mpi-run.sh
@@ -47,4 +42,17 @@ USER smts
 CMD ["/usr/sbin/sshd", "-D", "-f", "/home/smts/.ssh/sshd_config"]
 #RUN sleep 90000000;
 CMD [ "python3", "../SMTS/server/smts.py","-o4","-l"]
+#RUN sleep 90000000
+################
+#FROM smts_base AS smts_liaison
+#RUN apt-get update \
+#    && DEBIAN_FRONTEND=noninteractive apt install -y awscli python3 mpi
+#COPY --from=builder /home /home
+#ADD make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
+#RUN chmod 755 supervised-scripts/make_combined_hostfile.py
+#ADD mpi-run.sh supervised-scripts/mpi-run.sh
+#USER smts
+#CMD ["/usr/sbin/sshd", "-D", "-f", "/home/smts/.ssh/sshd_config"]
+#RUN sleep 90000000;
+#CMD [ "python3", "../SMTS/server/smts.py","-o4","-l"]
 #CMD supervised-scripts/mpi-run.sh
