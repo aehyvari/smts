@@ -15,10 +15,8 @@ RUN apt-get update \
 WORKDIR /home/
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
-
-#USER smts
-#CMD ["/usr/sbin/sshd", "-D", "-f", "/home/smts/.ssh/sshd_config"]
 EXPOSE 22
+
 ################
 FROM smts_base AS builder
 ENV CMAKE_BUILD_TYPE Release
@@ -32,27 +30,12 @@ RUN apt-get update \
      zlib1g-dev libopenmpi-dev git python3 awscli mpi
 RUN  git clone https://github.com/MasoudAsadzade/SMTS.git
 RUN sh SMTS/ci/run_travis_opensmtCommands.sh
-
 RUN sh SMTS/ci/run_travis_smtsCommands.sh
-
 ADD make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
 RUN chmod 755 supervised-scripts/make_combined_hostfile.py
 ADD mpi-run.sh supervised-scripts/mpi-run.sh
 USER smts
 CMD ["/usr/sbin/sshd", "-D", "-f", "/home/smts/.ssh/sshd_config"]
 #RUN sleep 90000000;
-CMD [ "python3", "/home/SMTS/server/smts.py","-o4","-l"]
-#RUN sleep 90000000
-################
-#FROM smts_base AS smts_liaison
-#RUN apt-get update \
-#    && DEBIAN_FRONTEND=noninteractive apt install -y awscli python3 mpi
-#COPY --from=builder /home /home
-#ADD make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
-#RUN chmod 755 supervised-scripts/make_combined_hostfile.py
-#ADD mpi-run.sh supervised-scripts/mpi-run.sh
-#USER smts
-#CMD ["/usr/sbin/sshd", "-D", "-f", "/home/smts/.ssh/sshd_config"]
-#RUN sleep 90000000;
-#CMD [ "python3", "../SMTS/server/smts.py","-o4","-l"]
-#CMD supervised-scripts/mpi-run.sh
+#CMD ["python3", "/home/SMTS/server/smts.py","-o4","-l"]
+CMD supervised-scripts/mpi-run.sh
