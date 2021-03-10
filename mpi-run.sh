@@ -33,14 +33,14 @@ fi
 # wait for all nodes to report
 wait_for_nodes () {
   log "Running as master node"
-
+  python3 SMTS/server/smts.py  -l &
   touch $HOST_FILE_PATH
   ip=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
 
   availablecores=$(nproc)
   log "master details -> $ip:$availablecores"
   log "main IP: $ip"
-  python3 SMTS/server/smts.py  -l &
+
 #  echo "$ip slots=$availablecores" >> $HOST_FILE_PATH
   echo "$ip" >> $HOST_FILE_PATH
   lines=$(ls -dq /tmp/hostfile* | wc -l)
