@@ -40,7 +40,7 @@ wait_for_nodes () {
   availablecores=$(nproc)
   log "master details -> $ip:$availablecores"
   log "main IP: $ip"
-  python3 SMTS/server/smts.py  -l
+  python3 SMTS/server/smts.py  -l &
 #  echo "$ip slots=$availablecores" >> $HOST_FILE_PATH
   echo "$ip" >> $HOST_FILE_PATH
   lines=$(ls -dq /tmp/hostfile* | wc -l)
@@ -57,14 +57,14 @@ wait_for_nodes () {
 
   # All of the hosts report their IP and number of processors. Combine all these
   # into one file with the following script:
-  supervised-scripts/make_combined_hostfile.py ${ip}
+  python3 supervised-scripts/make_combined_hostfile.py ${ip}
   cat combined_hostfile
   sleep 2
   # REPLACE THE FOLLOWING LINE WITH YOUR PARTICULAR SOLVER
   time mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile combined_hostfile SMTS/build/solver_opensmt -s ${ip}:3000
-  sleep 3
+  sleep 10
   python3 SMTS/server/client.py 3000  opensmt/opensmt/regression/QF_UF/NEQ004_size4.smt2
-  sleep 3
+  sleep 5
   python3 SMTS/server/client.py 3000 -t
 }
 
