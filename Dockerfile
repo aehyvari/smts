@@ -33,8 +33,9 @@ RUN sh SMTS/ci/run_travis_opensmtCommands.sh
 RUN sh SMTS/ci/run_travis_smtsCommands.sh
 ADD make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
 RUN chmod 755 supervised-scripts/make_combined_hostfile.py
-ADD combined_hostfile supervised-scripts/combined_hostfile
-RUN chmod 755 supervised-scripts/combined_hostfile
+#ADD combined_hostfile supervised-scripts/combined_hostfile
+#RUN chmod 755 supervised-scripts/combined_hostfile
+RUN chmod 755 .
 ADD mpi-run.sh supervised-scripts/mpi-run.sh
 RUN chmod 755 supervised-scripts/mpi-run.sh
 USER smts
