@@ -54,13 +54,11 @@ wait_for_nodes () {
 #    lines=$(sort $HOST_FILE_PATH|uniq|wc -l)
   done
 
-
   # All of the hosts report their IP and number of processors. Combine all these
   # into one file with the following script:
   python3 supervised-scripts/make_combined_hostfile.py ${ip}
   cat /home/supervised-scripts/combined_hostfile
-  sleep 2
-  # REPLACE THE FOLLOWING LINE WITH YOUR PARTICULAR SOLVER
+  sleep 10
   time mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile /home/supervised-scripts/combined_hostfile SMTS/build/solver_opensmt -s ${ip}:3000 &
   sleep 10
   python3 SMTS/server/client.py 3000  opensmt/opensmt/regression/QF_UF/NEQ004_size4.smt2
@@ -70,8 +68,7 @@ wait_for_nodes () {
 
 # Fetch and run a script
 report_to_master () {
-  # get own ip and num cpus
-  #
+  # get own ip
   ip=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
 
 
