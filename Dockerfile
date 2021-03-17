@@ -33,13 +33,10 @@ RUN sh SMTS/ci/run_travis_opensmtCommands.sh
 RUN sh SMTS/ci/run_travis_smtsCommands.sh
 ADD make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
 RUN chmod 755 supervised-scripts/make_combined_hostfile.py
-#ADD combined_hostfile supervised-scripts/combined_hostfile
-#RUN chmod 755 supervised-scripts/combined_hostfile
+
 RUN chmod 777 supervised-scripts
 ADD mpi-run.sh supervised-scripts/mpi-run.sh
 RUN chmod 755 supervised-scripts/mpi-run.sh
 USER smts
 CMD ["/usr/sbin/sshd", "-D", "-f", "/home/smts/.ssh/sshd_config"]
-#RUN sleep 90000000;
-#CMD ["python3", "/home/SMTS/server/smts.py","-o4","-l"]
 CMD supervised-scripts/mpi-run.sh
