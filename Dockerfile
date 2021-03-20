@@ -30,12 +30,11 @@ RUN apt-get update \
 RUN git clone https://github.com/MasoudAsadzade/SMTS.git
 RUN cd SMTS && sh awcCloudTrack/awsRunBatch/make_opensmt.sh
 RUN cd SMTS && sh awcCloudTrack/awsRunBatch/make_smts.sh
-RUN sleep 9000000
-ADD /home/SMTS/awcCloudTrack/awsRunBatch/make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
+ADD SMTS/awcCloudTrack/awsRunBatch/make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
 RUN chmod 755 supervised-scripts/make_combined_hostfile.py
 RUN chmod 755 SMTS/awcCloudTrack/awsRunBatch/run_aws_client.sh
 RUN chmod 777 supervised-scripts
-ADD /home/SMTS/awcCloudTrack/awsRunBatch/mpi-run.sh supervised-scripts/mpi-run.sh
+ADD SMTS/awcCloudTrack/awsRunBatch/mpi-run.sh supervised-scripts/mpi-run.sh
 RUN chmod 755 supervised-scripts/mpi-run.sh
 USER smts
 CMD ["/usr/sbin/sshd", "-D", "-f", "/home/.ssh/sshd_config"]
