@@ -60,7 +60,8 @@ wait_for_nodes () {
   cat supervised-scripts/combined_hostfile
   time mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile supervised-scripts/combined_hostfile SMTS/build/solver_opensmt -s ${ip}:3000 &
   sleep 5
-  SMTS/awcCloudTrack/awsRunBatch/run_aws_client.sh "SMTS/hpcClusterBenchs"
+  #SMTS/awcCloudTrack/awsRunBatch/run_aws_client.sh "SMTS/hpcClusterBenchs"
+  SMTS/awcCloudTrack/awsRunBatch/run_aws_client.sh "SMTS/awcCloudTrack/awsRunBatch/iso_brn029_simplified_1b.smt2"
 }
 
 # Fetch and run a script
