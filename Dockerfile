@@ -29,7 +29,7 @@ RUN apt-get update \
      zlib1g-dev libopenmpi-dev git python3 awscli mpi
 RUN git clone https://github.com/MasoudAsadzade/SMTS.git
 RUN cd SMTS && sh awcCloudTrack/awsRunBatch/make_opensmt.sh
-RUN sh SMTS/awcCloudTrack/awsRunBatch/make_smts.sh
+RUN cd SMTS && sh awcCloudTrack/awsRunBatch/make_smts.sh
 ADD SMTS/awcCloudTrack/awsRunBatch/make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
 RUN chmod 755 supervised-scripts/make_combined_hostfile.py
 RUN chmod 755 SMTS/awcCloudTrack/awsRunBatch/run_aws_client.sh
