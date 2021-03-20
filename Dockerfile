@@ -12,7 +12,7 @@ RUN apt-get update \
         && cp /etc/ssh/sshd_config ~/.ssh/sshd_config \
         && sed -i "s/UsePrivilegeSeparation yes/UsePrivilegeSeparation no/g" ~/.ssh/sshd_config \
         && printf "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config'
-WORKDIR /home/
+WORKDIR /home
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 EXPOSE 22
@@ -20,23 +20,22 @@ EXPOSE 22
 ################
 FROM smts_base AS builder
 ENV CMAKE_BUILD_TYPE Release
-ENV INSTALL /home/opensmt
-ENV EXTERNALREPODIR opensmt
+ENV INSTALL /home/SMTS/opensmt
 ENV USE_READLINE OFF
 ENV FLAGS -Wall
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt install -y apt-utils make cmake \
      build-essential libgmp-dev libedit-dev libsqlite3-dev bison flex libubsan0 \
      zlib1g-dev libopenmpi-dev git python3 awscli mpi
-RUN  git clone https://github.com/MasoudAsadzade/SMTS.git
-RUN sh SMTS/ci/run_travis_opensmtCommands.sh
-RUN sh SMTS/ci/run_travis_smtsCommands.sh
+RUN git clone https://github.com/MasoudAsadzade/SMTS.git
+RUN cd SMTS && sh awcCloudTrack/awsRunBatch/make_opensmt.sh
+RUN cd ../.. && sh awcCloudTrack/awsRunBatch/make_smts.sh
 ADD make_combined_hostfile.py supervised-scripts/make_combined_hostfile.py
 RUN chmod 755 supervised-scripts/make_combined_hostfile.py
-
+RUN chmod 755 awcCloudTrack/awsRunBatch/run_aws_client.sh
 RUN chmod 777 supervised-scripts
 ADD mpi-run.sh supervised-scripts/mpi-run.sh
 RUN chmod 755 supervised-scripts/mpi-run.sh
 USER smts
-CMD ["/usr/sbin/sshd", "-D", "-f", "/home/smts/.ssh/sshd_config"]
+CMD ["/usr/sbin/sshd", "-D", "-f", "/home/.ssh/sshd_config"]
 CMD supervised-scripts/mpi-run.sh
