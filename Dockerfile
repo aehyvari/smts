@@ -12,7 +12,7 @@ RUN apt-get update \
         && cp /etc/ssh/sshd_config ~/.ssh/sshd_config \
         && sed -i "s/UsePrivilegeSeparation yes/UsePrivilegeSeparation no/g" ~/.ssh/sshd_config \
         && printf "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config'
-WORKDIR /home
+WORKDIR /home/SMTS
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 EXPOSE 22
@@ -32,9 +32,9 @@ RUN cd SMTS && sh awcCloudTrack/awsRunBatch/make_opensmt.sh
 RUN cd SMTS && sh awcCloudTrack/awsRunBatch/make_smts.sh
 
 RUN cd SMTS && chmod 755 awcCloudTrack/awsRunBatch/make_combined_hostfile.py
-RUN chmod 755 awcCloudTrack/awsRunBatch/mpi-run.sh
-RUN chmod 755 awcCloudTrack/awsRunBatch/run_aws_client.sh
-RUN chmod 777 awcCloudTrack/awsRunBatch
+RUN cd SMTS && chmod 755 awcCloudTrack/awsRunBatch/mpi-run.sh
+RUN cd SMTS && chmod 755 awcCloudTrack/awsRunBatch/run_aws_client.sh
+RUN cd SMTS && chmod 777 awcCloudTrack/awsRunBatch
 USER smts
 CMD ["/usr/sbin/sshd", "-D", "-f", "/home/.ssh/sshd_config"]
 CMD ["python3", "SMTS/server/smts.py","-o4","-l"]
