@@ -34,11 +34,11 @@ ADD awcCloudTrack/awsRunBatch/make_combined_hostfile.py supervised-scripts/make_
 ADD awcCloudTrack/awsRunBatch/mpi-run.sh supervised-scripts/mpi-run.sh
 ADD awcCloudTrack/awsRunBatch/run_aws_client.sh run_aws_client.sh
 RUN sleep 9000000
-RUN chmod 755 supervised-scripts/make_combined_hostfile.py
-RUN chmod 755 awcCloudTrack/awsRunBatch/run_aws_client.sh
+RUN cd ..&& chmod 755 supervised-scripts/make_combined_hostfile.py
+RUN chmod 755 run_aws_client.sh
 RUN chmod 777 supervised-scripts
 RUN chmod 755 supervised-scripts/mpi-run.sh
 USER smts
 CMD ["/usr/sbin/sshd", "-D", "-f", "/home/.ssh/sshd_config"]
-CMD ["python3", "/home/SMTS/server/smts.py","-o4","-l"]
+CMD ["python3", "SMTS/server/smts.py","-o4","-l"]
 #CMD supervised-scripts/mpi-run.sh
