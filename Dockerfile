@@ -38,4 +38,4 @@ RUN cd SMTS && chmod 777 awcCloudTrack/awsRunBatch
 USER smts
 CMD ["/usr/sbin/sshd", "-D", "-f", "/home/.ssh/sshd_config"]
 #CMD ["python3", "server/smts.py","-o4","-l"]
-CMD SMTS/supervised-scripts/mpi-run.sh
+CMD SMTS/awcCloudTrack/awsRunBatch/mpi-run.sh
