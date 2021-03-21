@@ -11,5 +11,5 @@ for filename in onlyfiles:
     if "hostfile" in filename:
         with open(join(HOST_FILE_PATH, filename)) as f:
             combined_text+=f.read()
-with open("supervised-scripts/combined_hostfile", "w") as f:
+with open("SMTS/awcCloudTrack/awsRunBatch/combined_hostfile", "w") as f:
     f.write(combined_text)
