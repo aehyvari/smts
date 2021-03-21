@@ -30,6 +30,7 @@ RUN apt-get update \
 RUN git clone https://github.com/MasoudAsadzade/SMTS.git
 RUN cd SMTS && sh awcCloudTrack/awsRunBatch/make_opensmt.sh
 RUN cd SMTS && sh awcCloudTrack/awsRunBatch/make_smts.sh
+RUN cd SMTS
 RUN chmod 755 awcCloudTrack/awsRunBatch/make_combined_hostfile.py
 RUN chmod 755 awcCloudTrack/awsRunBatch/mpi-run.sh
 RUN chmod 755 awcCloudTrack/awsRunBatch/run_aws_client.sh
