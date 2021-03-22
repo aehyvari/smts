@@ -4,7 +4,7 @@ import argparse
 import json
 import subprocess
 from time import sleep
-
+import re
 import boto3
 
 class LogAnalyzer:
@@ -113,12 +113,12 @@ class Cloudformation:
 def main(args):
     session = boto3.session.Session(profile_name=args.profile)
 
-    CLUSTER_NAME = "UsiVeriySMTCompCluster"
+    CLUSTER_NAME = "UsiVeriySATCompCluster"
     cf = Cloudformation(session.client("cloudformation"))
     stack_outputs = cf.get_outputs(f"job-queue-{args.project_name}")
     print(stack_outputs)
 
-    output = subprocess.check_output(['./run-solver-main.sh', args.profile, CLUSTER_NAME, stack_outputs["SolverProjectDefinition"], stack_outputs["Subnet"], stack_outputs["SecurityGroupId"], args.file, '2', args.project_name])
+    output = subprocess.check_output(['./run-solver-main.sh', args.profile, CLUSTER_NAME, stack_outputs["SolverProjectDefinition"], stack_outputs["Subnet"], stack_outputs["SecurityGroupId"], args.file, '1', args.project_name])
     task_output = json.loads(output)
 
     task_arn = task_output['tasks'][0]['taskArn']
@@ -131,7 +131,7 @@ def main(args):
     ip_fetcher = IpFetch(log_analyzer)
     ip_addr = ip_fetcher.fetch_ip(args.project_name, task_id)
 
-    output2 = subprocess.check_output(['./run-worker.sh', args.profile, CLUSTER_NAME, stack_outputs["SolverProjectDefinition"], stack_outputs["Subnet"], stack_outputs["SecurityGroupId"], args.file, '2', ip_addr, args.project_name])
+    output2 = subprocess.check_output(['./run-worker.sh', args.profile, CLUSTER_NAME, stack_outputs["SolverProjectDefinition"], stack_outputs["Subnet"], stack_outputs["SecurityGroupId"], args.file, '4', ip_addr, args.project_name])
     task_output2 = json.loads(output2)
 
     task_arn2 = task_output2['tasks'][0]['taskArn']
@@ -142,7 +142,13 @@ def main(args):
     worker_task.kill()
     logs = log_analyzer.fetch_logs(args.project_name, task_id)
     print(logs)
-
+    regStr="<SMT \"(.*)\":(sat|unsat)>\[(.*)\]>:\ (sat|unsat)\n*(.*)solved instance \"(.*)\" after [0-9]+.[0-9]+ seconds"
+    #satmatchedStr=re.findall(regStr, logs)
+    for match in re.finditer(regStr, logs):
+        timeout=re.findall("[0-9]+\.[0-9]+", match.group())
+        benchname=re.findall("\"(.*)\"\ ", match.group())
+        result=re.findall("(sat|unsat)", match.group())
+        print(benchname[0], result[0],timeout[0])
 
 pars = argparse.ArgumentParser()
 for arg in [{
