@@ -60,14 +60,14 @@ wait_for_nodes () {
   python3 SMTS/awcCloudTrack/awsRunBatch/make_combined_hostfile.py ${ip}
   cat SMTS/awcCloudTrack/awsRunBatch/combined_hostfile
   time mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile SMTS/awcCloudTrack/awsRunBatch/combined_hostfile SMTS/build/solver_opensmt -s ${ip}:3000 &
-  sleep 1
+  sleep 5
   # SMTS/awcCloudTrack/awsRunBatch/run_aws_smtsClient.sh "SMTS/hpcClusterBenchs"
+  echo "Send benchs files"
+  SMTS/awcCloudTrack/awsRunBatch/run_aws_smtsClient.sh "SMTS/testBenchs"
 }
 
 # Fetch and run a script
 report_to_master () {
-  echo "Send benchs files"
-  SMTS/awcCloudTrack/awsRunBatch/run_aws_smtsClient.sh "SMTS/testBenchs"
   # get own ip
   ip=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
   availablecores=$(nproc)
@@ -79,8 +79,8 @@ report_to_master () {
   ping -c 3 ${AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS}
   until scp $HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX} ${AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS}:$HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX}
   do
-    echo "Sleeping 5 seconds and trying again"
-    sleep 5
+    echo "Sleeping 2 seconds and trying again"
+    sleep 2
   done
   python3 SMTS/server/client.py 3000 -t
   log "done! goodbye"
