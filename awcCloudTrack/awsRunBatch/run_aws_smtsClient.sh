@@ -6,7 +6,7 @@ if [ $# != 1 ]; then
 fi
 
 for folder in "$1"/*; do
-    for file in "$folder"/*; do
+    for file in "$folder"/*/*; do
       SMTS/server/client.py 3000 $file
     done
 done
