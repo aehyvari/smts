@@ -61,7 +61,7 @@ wait_for_nodes () {
   cat SMTS/awcCloudTrack/awsRunBatch/combined_hostfile
   mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile SMTS/awcCloudTrack/awsRunBatch/combined_hostfile python3 SMTS/server/smts.py  -l &
   sleep 5
-  mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile SMTS/awcCloudTrack/awsRunBatch/combined_hostfile SMTS/build/solver_opensmt -s ${ip}:3000
+  mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile SMTS/awcCloudTrack/awsRunBatch/combined_hostfile SMTS/build/solver_opensmt -s ${ip}:3000 &
 
   sleep 5
   echo "Send benchs files"
