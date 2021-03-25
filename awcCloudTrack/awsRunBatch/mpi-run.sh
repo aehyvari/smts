@@ -40,7 +40,8 @@ wait_for_nodes () {
   availablecores=$(nproc)
   log "master details (ip:cores) -> $ip:$availablecores"
   log "main IP: $ip"
-
+  echo "SMTS Server is running..."
+  python3 SMTS/server/smts.py  -l &
 #  echo "$ip slots=$availablecores" >> $HOST_FILE_PATH
   echo "$ip" >> $HOST_FILE_PATH
   lines=$(ls -dq /tmp/hostfile* | wc -l)
@@ -51,7 +52,11 @@ wait_for_nodes () {
       lines=$(ls -dq /tmp/hostfile* | wc -l)
 
       log "$lines out of $AWS_BATCH_JOB_NUM_NODES nodes joined, check again in 1 second"
-      sleep 1
+      if  [ "$lines" == "${AWS_BATCH_JOB_NUM_NODES}" ]
+      then
+        echo "Close SMTS server"
+        python3 SMTS/server/client.py 3000 -t
+      fi
   #    lines=$(sort $HOST_FILE_PATH|uniq|wc -l)
     done
 
@@ -59,14 +64,11 @@ wait_for_nodes () {
   # into one file with the following script:
   python3 SMTS/awcCloudTrack/awsRunBatch/make_combined_hostfile.py ${ip}
   cat SMTS/awcCloudTrack/awsRunBatch/combined_hostfile
-  mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile SMTS/awcCloudTrack/awsRunBatch/combined_hostfile python3 SMTS/server/smts.py  -l &
-  sleep 5
   mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile SMTS/awcCloudTrack/awsRunBatch/combined_hostfile SMTS/build/solver_opensmt -s ${ip}:3000 &
 
   sleep 5
-  echo "Send benchs files"
-  SMTS/awcCloudTrack/awsRunBatch/run_aws_smtsClient.sh "SMTS/testBenchs"
-  #sleep 9000
+  echo "Send bench files"
+  SMTS/awcCloudTrack/awsRunBatch/run_aws_smtsClient.sh "SMTS/hpcClusterBenchs"
 }
 
 # Fetch and run a script
@@ -85,7 +87,6 @@ report_to_master () {
     echo "Sleeping 2 seconds and trying again"
     sleep 2
   done
-  python3 SMTS/server/client.py 3000 -t
   log "done! goodbye"
   ps -ef | grep sshd
   tail -f /dev/null

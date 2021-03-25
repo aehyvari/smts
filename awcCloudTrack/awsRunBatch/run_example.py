@@ -113,7 +113,7 @@ class Cloudformation:
 def main(args):
     session = boto3.session.Session(profile_name=args.profile)
 
-    CLUSTER_NAME = "UsiVeriySATCompCluster"
+    CLUSTER_NAME = "UsiVeriySMTCompCluster"
     cf = Cloudformation(session.client("cloudformation"))
     stack_outputs = cf.get_outputs(f"job-queue-{args.project_name}")
     print(stack_outputs)
@@ -131,7 +131,7 @@ def main(args):
     ip_fetcher = IpFetch(log_analyzer)
     ip_addr = ip_fetcher.fetch_ip(args.project_name, task_id)
 
-    output2 = subprocess.check_output(['./run-worker.sh', args.profile, CLUSTER_NAME, stack_outputs["SolverProjectDefinition"], stack_outputs["Subnet"], stack_outputs["SecurityGroupId"], args.file, '4', ip_addr, args.project_name])
+    output2 = subprocess.check_output(['./run-worker.sh', args.profile, CLUSTER_NAME, stack_outputs["SolverProjectDefinition"], stack_outputs["Subnet"], stack_outputs["SecurityGroupId"], args.file, '2', ip_addr, args.project_name])
     task_output2 = json.loads(output2)
 
     task_arn2 = task_output2['tasks'][0]['taskArn']
