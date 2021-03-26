@@ -42,6 +42,7 @@ wait_for_nodes () {
   log "main IP: $ip"
   echo "SMTS Server is running..."
   python3 SMTS/server/smts.py  -l &
+  sleep 2
 #  echo "$ip slots=$availablecores" >> $HOST_FILE_PATH
   echo "$ip" >> $HOST_FILE_PATH
   lines=$(ls -dq /tmp/hostfile* | wc -l)
@@ -52,11 +53,8 @@ wait_for_nodes () {
       lines=$(ls -dq /tmp/hostfile* | wc -l)
 
       log "$lines out of $AWS_BATCH_JOB_NUM_NODES nodes joined, check again in 1 second"
-      if  [ "$lines" == "${AWS_BATCH_JOB_NUM_NODES}" ]
-      then
-        echo "Close SMTS server"
-        python3 SMTS/server/client.py 3000 -t
-      fi
+      sleep 1
+
   #    lines=$(sort $HOST_FILE_PATH|uniq|wc -l)
     done
 
@@ -90,6 +88,11 @@ report_to_master () {
   log "done! goodbye"
   ps -ef | grep sshd
   tail -f /dev/null
+ # if  [ "$AWS_BATCH_JOB_NODE_INDEX" == "${AWS_BATCH_JOB_NUM_NODES-1}" ]
+  #  then
+   #   echo "Close SMTS server"
+   #   python3 SMTS/server/client.py 3000 -t
+  #fi
 }
 ##
 #
