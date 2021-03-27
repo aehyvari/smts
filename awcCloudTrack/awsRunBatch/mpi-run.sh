@@ -65,11 +65,11 @@ wait_for_nodes () {
     if  [ "${worker_ip}" == "$ip slots=$availablecores" ]
     then
       echo "SMTS Server is running..."
-      mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile SMTS/awcCloudTrack/awsRunBatch/"${worker_ip}" python3 SMTS/server/smts.py  -l  &
+      mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile SMTS/awcCloudTrack/awsRunBatch/"${worker_ip}" python3 SMTS/server/smts.py  -l  &
       sleep 2
     else
       echo "Opensmt clients are running..."
-      mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile SMTS/awcCloudTrack/awsRunBatch/"${worker_ip}" SMTS/build/solver_opensmt -s ${ip}:3000 &
+      mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile SMTS/awcCloudTrack/awsRunBatch/"${worker_ip}" SMTS/build/solver_opensmt -s ${ip}:3000 &
     fi
   done
   echo "Send bench files"
