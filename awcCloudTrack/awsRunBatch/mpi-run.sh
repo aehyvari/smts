@@ -40,11 +40,8 @@ wait_for_nodes () {
   availablecores=$(nproc)
   log "master details (ip:cores) -> $ip:$availablecores"
   log "main IP: $ip"
-  echo "SMTS Server is running..."
-  python3 SMTS/server/smts.py  -l &
-  sleep 2
-#  echo "$ip slots=$availablecores" >> $HOST_FILE_PATH
-  echo "$ip" >> $HOST_FILE_PATH
+  echo "$ip slots=$availablecores" >> $HOST_FILE_PATH
+  #echo "$ip" >> $HOST_FILE_PATH
   lines=$(ls -dq /tmp/hostfile* | wc -l)
 
   while [ "${AWS_BATCH_JOB_NUM_NODES}" -gt "${lines}" ]
@@ -64,17 +61,24 @@ wait_for_nodes () {
   IFS=$'\n' read -d '' -r -a workerNodes < SMTS/awcCloudTrack/awsRunBatch/combined_hostfile
   for worker_ip in "${workerNodes[@]}"
   do
-    if  [ "${worker_ip}" != "${ip}" ]
-     then
-      #mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root  SMTS/build/solver_opensmt -s ${worker_ip}:3000 &
-      #sleep 1
-     #mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile SMTS/awcCloudTrack/awsRunBatch/combined_hostfile SMTS/build/solver_opensmt -s ${worker_ip}:3000 &
-      echo "worker_ip $worker_ip"
+    echo "$ip" >>  SMTS/awcCloudTrack/awsRunBatch/"${worker_ip}"
+    if  [ "${worker_ip}" == "$ip slots=$availablecores" ]
+    then
+      echo "SMTS Server is running..."
+      mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile SMTS/awcCloudTrack/awsRunBatch/"${worker_ip}" python3 SMTS/server/smts.py  -l  &
+      sleep 2
+    else
+      echo "Opensmt clients are running..."
+      mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile SMTS/awcCloudTrack/awsRunBatch/"${worker_ip}" SMTS/build/solver_opensmt -s ${ip}:3000 &
     fi
-
   done
   echo "Send bench files"
+  sleep 2
   SMTS/awcCloudTrack/awsRunBatch/run_aws_smtsClient.sh "SMTS/hpcClusterBenchs"
+  ps -ef | grep sshd
+  tail -f /dev/null
+  echo "Close SMTS server"
+  python3 SMTS/server/client.py 3000 -t
 }
 
 # Fetch and run a script
@@ -85,27 +89,18 @@ report_to_master () {
 
   log "I am a child node -> $ip:$availablecores, reporting to the master node -> ${AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS}"
 
-# echo "$ip slots=$availablecores" >> $HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX}
-  echo "$ip" >> $HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX}
+  echo "$ip slots=$availablecores" >> $HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX}
   ping -c 3 ${AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS}
   until scp $HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX} ${AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS}:$HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX}
   do
     echo "Sleeping 2 seconds and trying again"
     sleep 2
   done
-  mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root  -np 1 SMTS/build/solver_opensmt -s ${AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS}:3000 &
-  sleep 1
   log "done! goodbye"
   ps -ef | grep sshd
   tail -f /dev/null
- # if  [ "$AWS_BATCH_JOB_NODE_INDEX" == "${AWS_BATCH_JOB_NUM_NODES-1}" ]
-  #  then
-   #   echo "Close SMTS server"
-   #   python3 SMTS/server/client.py 3000 -t
-  #fi
 }
 ##
-#
 # Main - dispatch user request to appropriate function
 log $NODE_TYPE
 case $NODE_TYPE in
