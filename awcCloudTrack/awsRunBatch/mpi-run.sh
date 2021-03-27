@@ -66,8 +66,8 @@ wait_for_nodes () {
   do
     if  [ "${worker_ip}" != "${ip}" ]
      then
-      mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root  SMTS/build/solver_opensmt -s ${worker_ip}:3000 &
-      sleep 1
+      #mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root  SMTS/build/solver_opensmt -s ${worker_ip}:3000 &
+      #sleep 1
      #mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile SMTS/awcCloudTrack/awsRunBatch/combined_hostfile SMTS/build/solver_opensmt -s ${worker_ip}:3000 &
       echo "worker_ip $worker_ip"
     fi
@@ -93,6 +93,7 @@ report_to_master () {
     echo "Sleeping 2 seconds and trying again"
     sleep 2
   done
+  mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root  -np 1 SMTS/build/solver_opensmt -s ${ip}:3000
   log "done! goodbye"
   ps -ef | grep sshd
   tail -f /dev/null
