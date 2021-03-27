@@ -54,7 +54,6 @@ wait_for_nodes () {
 
       log "$lines out of $AWS_BATCH_JOB_NUM_NODES nodes joined, check again in 1 second"
       sleep 1
-
   #    lines=$(sort $HOST_FILE_PATH|uniq|wc -l)
     done
 
@@ -62,9 +61,18 @@ wait_for_nodes () {
   # into one file with the following script:
   python3 SMTS/awcCloudTrack/awsRunBatch/make_combined_hostfile.py ${ip}
   cat SMTS/awcCloudTrack/awsRunBatch/combined_hostfile
-  mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile SMTS/awcCloudTrack/awsRunBatch/combined_hostfile SMTS/build/solver_opensmt -s ${ip}:3000 &
+  IFS=$'\n' read -d '' -r -a workerNodes < SMTS/awcCloudTrack/awsRunBatch/combined_hostfile
+  for worker_ip in "${workerNodes[@]}"
+  do
+    if  [ "${worker_ip}" != "${ip}" ]
+     then
+      mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root  SMTS/build/solver_opensmt -s ${worker_ip}:3000 &
+      sleep 1
+     #mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np ${AWS_BATCH_JOB_NUM_NODES} --hostfile SMTS/awcCloudTrack/awsRunBatch/combined_hostfile SMTS/build/solver_opensmt -s ${worker_ip}:3000 &
+      echo "worker_ip $worker_ip"
+    fi
 
-  sleep 5
+  done
   echo "Send bench files"
   SMTS/awcCloudTrack/awsRunBatch/run_aws_smtsClient.sh "SMTS/hpcClusterBenchs"
 }
@@ -77,7 +85,7 @@ report_to_master () {
 
   log "I am a child node -> $ip:$availablecores, reporting to the master node -> ${AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS}"
 
-#  echo "$ip slots=$availablecores" >> $HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX}
+# echo "$ip slots=$availablecores" >> $HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX}
   echo "$ip" >> $HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX}
   ping -c 3 ${AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS}
   until scp $HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX} ${AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS}:$HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX}
