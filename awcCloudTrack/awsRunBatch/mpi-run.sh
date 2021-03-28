@@ -66,7 +66,10 @@ wait_for_nodes () {
   #  if  [ "${node_ip[0]}" == "$ip" ]
   #  then
   #    echo "SMTS Server is running..."
-  chmod 755 SMTS/awcCloudTrack/awsRunBatch/run_aws_osmt.sh
+  cat SMTS/awcCloudTrack/awsRunBatch/"${workerNodes[0]}"
+  cat SMTS/awcCloudTrack/awsRunBatch/"${workerNodes[1]}"
+  cat SMTS/awcCloudTrack/awsRunBatch/"${workerNodes[2]}"
+  cat SMTS/awcCloudTrack/awsRunBatch/"${workerNodes[3]}"
   mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile SMTS/awcCloudTrack/awsRunBatch/"${workerNodes[0]}" --app SMTS/awcCloudTrack/awsRunBatch/run_aws_osmt.sh "opensmt-1/hpcClusterBenchs/QF_LRA/sat"
   mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile SMTS/awcCloudTrack/awsRunBatch/"${workerNodes[1]}" --app SMTS/awcCloudTrack/awsRunBatch/run_aws_osmt.sh "opensmt-1/hpcClusterBenchs/QF_LRA/unsat"
   mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile SMTS/awcCloudTrack/awsRunBatch/"${workerNodes[2]}" --app SMTS/awcCloudTrack/awsRunBatch/run_aws_osmt.sh "opensmt-1/hpcClusterBenchs/QF_UF/sat"

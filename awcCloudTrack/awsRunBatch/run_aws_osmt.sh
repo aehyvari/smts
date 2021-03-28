@@ -6,7 +6,9 @@ if [ $# != 1 ]; then
 fi
 for folder in "$1"/*; do
     for file in "$folder"; do
-      time ./SMTS/opensmt/build/src/bin/opensmt $file
+      echo $file
+      ulimit -St 1200; time ./SMTS/opensmt/build/src/bin/opensmt $file
+      sleep 60
      #/usr/bin/time -o ${file}.time ./build/src/bin/opensmt $file
     done
 done
