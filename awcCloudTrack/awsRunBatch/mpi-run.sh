@@ -57,23 +57,21 @@ wait_for_nodes () {
   # into one file with the following script:
   python3 SMTS/awcCloudTrack/awsRunBatch/make_combined_hostfile.py ${ip}
   cat SMTS/awcCloudTrack/awsRunBatch/combined_hostfile
+
   IFS=$'\n' read -d '' -r -a workerNodes < SMTS/awcCloudTrack/awsRunBatch/combined_hostfile
+  i=0
   for worker_ip in "${workerNodes[@]}"
   do
   #  read -ra node_ip <<<${worker_ip}
+    i=$((${i} + 1))
+    echo  "${worker_ip}"
     echo "$ip" >>  SMTS/awcCloudTrack/awsRunBatch/"${worker_ip}"
+    mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile SMTS/awcCloudTrack/awsRunBatch/"${worker_ip}"  ulimit -St 1200; time ./SMTS/opensmt/build/src/bin/opensmt SMTS/hpcClusterBench/${COMP_S3_PROBLEM_PATH}${i}
   done
   #  if  [ "${node_ip[0]}" == "$ip" ]
   #  then
   #    echo "SMTS Server is running..."
-  cat SMTS/awcCloudTrack/awsRunBatch/"${workerNodes[0]}"
-  cat SMTS/awcCloudTrack/awsRunBatch/"${workerNodes[1]}"
-  cat SMTS/awcCloudTrack/awsRunBatch/"${workerNodes[2]}"
-  cat SMTS/awcCloudTrack/awsRunBatch/"${workerNodes[3]}"
-  mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile SMTS/awcCloudTrack/awsRunBatch/"${workerNodes[0]}" --app SMTS/awcCloudTrack/awsRunBatch/run_aws_osmt.sh "opensmt-1/hpcClusterBenchs/QF_LRA/sat"
-  mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile SMTS/awcCloudTrack/awsRunBatch/"${workerNodes[1]}" --app SMTS/awcCloudTrack/awsRunBatch/run_aws_osmt.sh "opensmt-1/hpcClusterBenchs/QF_LRA/unsat"
-  mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile SMTS/awcCloudTrack/awsRunBatch/"${workerNodes[2]}" --app SMTS/awcCloudTrack/awsRunBatch/run_aws_osmt.sh "opensmt-1/hpcClusterBenchs/QF_UF/sat"
-  mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile SMTS/awcCloudTrack/awsRunBatch/"${workerNodes[3]}" --app SMTS/awcCloudTrack/awsRunBatch/run_aws_osmt.sh "opensmt-1/hpcClusterBenchs/QF_UF/unsat"
+
   #    sleep 2
   #  else
    #   mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile SMTS/awcCloudTrack/awsRunBatch/"${node_ip[0]}" SMTS/build/solver_opensmt -s ${node_ip[0]}:3000 &
