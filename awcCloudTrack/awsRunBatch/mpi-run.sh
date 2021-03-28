@@ -38,9 +38,11 @@ wait_for_nodes () {
   ip=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
 
   availablecores=$(nproc)
-  log "master details (ip:cores) -> $ip:$availablecores"
-  log "main IP: $ip"
+  log "Server details (ip:cores) -> $ip:$availablecores"
+  log "server IP: $ip"
   echo "$ip slots=$availablecores" >> $HOST_FILE_PATH
+  python3 SMTS/server/smts.py  -l  &
+  sleep 1
   #echo "$ip" >> $HOST_FILE_PATH
   lines=$(ls -dq /tmp/hostfile* | wc -l)
 
@@ -48,7 +50,6 @@ wait_for_nodes () {
     do
       cat $HOST_FILE_PATH
       lines=$(ls -dq /tmp/hostfile* | wc -l)
-
       log "$lines out of $AWS_BATCH_JOB_NUM_NODES nodes joined, check again in 1 second"
       sleep 1
   #    lines=$(sort $HOST_FILE_PATH|uniq|wc -l)
@@ -58,23 +59,22 @@ wait_for_nodes () {
   # into one file with the following script:
   python3 SMTS/awcCloudTrack/awsRunBatch/make_combined_hostfile.py ${ip}
   cat SMTS/awcCloudTrack/awsRunBatch/combined_hostfile
-  IFS=$'\n' read -d '' -r -a workerNodes < SMTS/awcCloudTrack/awsRunBatch/combined_hostfile
-  for worker_ip in "${workerNodes[@]}"
-  do
-    read -ra node_ip <<<${worker_ip}
-    echo "$ip" >>  SMTS/awcCloudTrack/awsRunBatch/"${node_ip[0]}"
-    if  [ "${node_ip[0]}" == "$ip" ]
-    then
-      echo "SMTS Server is running..."
-      mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile SMTS/awcCloudTrack/awsRunBatch/"${node_ip[0]}" python3 SMTS/server/smts.py  -l  &
-      sleep 2
-    else
-      mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile SMTS/awcCloudTrack/awsRunBatch/"${node_ip[0]}" SMTS/build/solver_opensmt -s ${node_ip[0]}:3000 &
-      sleep 1
-    fi
-  done
+  #IFS=$'\n' read -d '' -r -a workerNodes < SMTS/awcCloudTrack/awsRunBatch/combined_hostfile
+  #for worker_ip in "${workerNodes[@]}"
+  #do
+  #  read -ra node_ip <<<${worker_ip}
+  #  echo "$ip" >>  SMTS/awcCloudTrack/awsRunBatch/"${node_ip[0]}"
+  #  if  [ "${node_ip[0]}" == "$ip" ]
+  #  then
+  #    echo "SMTS Server is running..."
+  #    mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile SMTS/awcCloudTrack/awsRunBatch/"${node_ip[0]}" python3 SMTS/server/smts.py  -l  &
+  #    sleep 2
+  #  else
+   #   mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile SMTS/awcCloudTrack/awsRunBatch/"${node_ip[0]}" SMTS/build/solver_opensmt -s ${node_ip[0]}:3000 &
+   #   sleep 1
+   # fi
+  #done
   echo "Send bench files"
-  sleep 2
   SMTS/awcCloudTrack/awsRunBatch/run_aws_smtsClient.sh "SMTS/hpcClusterBenchs"
   ps -ef | grep sshd
   tail -f /dev/null
@@ -88,7 +88,7 @@ report_to_master () {
   ip=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
   availablecores=$(nproc)
 
-  log "I am a child node -> $ip:$availablecores, reporting to the master node -> ${AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS}"
+  log "I am a opensmt child node${AWS_BATCH_JOB_NODE_INDEX} -> $ip:$availablecores, reporting to the server node -> ${AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS}"
 
   echo "$ip slots=$availablecores" >> $HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX}
   ping -c 3 ${AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS}
@@ -97,7 +97,7 @@ report_to_master () {
     echo "Sleeping 2 seconds and trying again"
     sleep 2
   done
-  log "done! goodbye"
+  mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1  --hostfile SMTS/awcCloudTrack/awsRunBatch/"$HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX}" SMTS/build/solver_opensmt -s ${AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS}:3000 &
   ps -ef | grep sshd
   tail -f /dev/null
 }
