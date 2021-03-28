@@ -57,7 +57,9 @@ wait_for_nodes () {
   # into one file with the following script:
   python3 SMTS/awcCloudTrack/awsRunBatch/make_combined_hostfile.py ${ip}
   cat SMTS/awcCloudTrack/awsRunBatch/combined_hostfile
-  mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile $HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX}  --app SMTS/awcCloudTrack/awsRunBatch/run_aws_osmt.sh "SMTS/hpcClusterBenchs/${COMP_S3_PROBLEM_PATH}"
+  #mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile $HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX}  --app SMTS/awcCloudTrack/awsRunBatch/run_aws_osmt.sh "SMTS/hpcClusterBenchs/${COMP_S3_PROBLEM_PATH}"
+  echo "${COMP_S3_PROBLEM_PATH}"
+  ulimit -St 1200; time ./SMTS/opensmt/build/src/bin/opensmt SMTS/hpcClusterBenchs/${COMP_S3_PROBLEM_PATH}
 #  IFS=$'\n' read -d '' -r -a workerNodes < SMTS/awcCloudTrack/awsRunBatch/combined_hostfile
 #  i=0
 #  for worker_ip in "${workerNodes[@]}"
@@ -97,7 +99,9 @@ report_to_master () {
     echo "Sleeping 2 seconds and trying again"
     sleep 2
   done
-  mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile $HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX}  --app SMTS/awcCloudTrack/awsRunBatch/run_aws_osmt.sh "SMTS/hpcClusterBenchs/${COMP_S3_PROBLEM_PATH}"
+  #mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1 --hostfile $HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX}  --app SMTS/awcCloudTrack/awsRunBatch/run_aws_osmt.sh "SMTS/hpcClusterBenchs/${COMP_S3_PROBLEM_PATH}"
+  echo "${COMP_S3_PROBLEM_PATH}"
+  ulimit -St 1200; time ./SMTS/opensmt/build/src/bin/opensmt SMTS/hpcClusterBenchs/${COMP_S3_PROBLEM_PATH}
   ps -ef | grep sshd
   tail -f /dev/null
 }
