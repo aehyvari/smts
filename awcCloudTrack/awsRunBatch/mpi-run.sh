@@ -95,7 +95,7 @@ report_to_master () {
     echo "Sleeping 2 seconds and trying again"
     sleep 2
   done
-  mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 1  --hostfile $HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX} SMTS/build/solver_opensmt -s ${AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS}:3000 &
+  mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 8  --hostfile $HOST_FILE_PATH${AWS_BATCH_JOB_NODE_INDEX} SMTS/build/solver_opensmt -s ${AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS}:3000 &
   ps -ef | grep sshd
   tail -f /dev/null
 }
