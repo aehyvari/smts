@@ -1,7 +1,7 @@
 find_package(Threads REQUIRED)
 
 find_package(SQLITE3 REQUIRED)
-include_directories(${SQLITE3_INCLUDE_DIR})
+include_directories(${SQLite3_INCLUDE_DIR})
 
 add_library(Lib
         lib.cpp
@@ -18,4 +18,4 @@ add_library(Lib
         sqlite3/Statement.cpp
         )
 
-target_link_libraries(Lib ${SQLITE3_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(Lib ${SQLite3_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})

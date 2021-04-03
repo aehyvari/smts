@@ -1,21 +1,19 @@
-find_package(OPENSMT2 REQUIRED)
+include(FetchContent)
 
-#if (NOT OPENSMT2_FOUND)
-#    include(ExternalProject)
-#    ExternalProject_Add(OpenSMT2
-#            GIT_REPOSITORY https://scm.ti-edu.ch/repogit/opensmt2.git
-#            UPDATE_COMMAND git pull
-#            PATCH_COMMAND autoreconf --force --install
-#            BUILD_IN_SOURCE 1
-#            CONFIGURE_COMMAND ./configure --enable-library --prefix=${CMAKE_BINARY_DIR}/install --with-gmp=${GMP_PATH}
-#            BUILD_COMMAND make
-#            INSTALL_COMMAND make install
-#            )
-#    set(OPENSMT2_INCLUDE_DIR ${CMAKE_BINARY_DIR}/install/include)
-#    set(OPENSMT2_LIBRARY_DIR ${CMAKE_BINARY_DIR}/install/lib)
-#endif ()
+FetchContent_Declare(
+        opensmt
+        GIT_REPOSITORY https://github.com/usi-verification-and-security/opensmt.git
+)
 
-include_directories(${OPENSMT2_INCLUDE_DIR}/opensmt)
+FetchContent_GetProperties(opensmt)
+if(NOT opensmt_POPULATED)
+    FetchContent_Populate(opensmt)
+    add_subdirectory(${opensmt_SOURCE_DIR} ${opensmt_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
+find_package(GMP REQUIRED)
+
+include_directories(${OPENSMT2_SOURCE_DIR} ${GMP_INCLUDE_DIR})
 
 add_executable(solver_opensmt ../main.cpp SolverProcess.cpp OpenSMTSolver.cpp)
 
@@ -29,4 +27,5 @@ set_target_properties(solver_opensmt PROPERTIES
         COMPILE_FLAGS ${solver_opensmt_flags}
         )
 
-target_link_libraries(solver_opensmt client ${OPENSMT2_LIBRARY} gmp gmpxx z)
+    target_link_libraries(solver_opensmt client ${OPENSMT2_LIBRARY}
+        ${GMP_LIBRARY} ${GMPXX_LIBRARY} z)
